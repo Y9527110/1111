@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yy上衫的个人主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --bg-start: #f0f4ff;
+            --bg-end: #e0e8ff;
+            --text: #111827;
+            --text-light: #6b7280;
+            --accent: #3b82f6;
+            --accent-rgb: 59, 130, 246;
+            --card: rgba(255, 255, 255, 0.65);
+            --card-blur: 20px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            --avatar-glow: 0 0 30px rgba(59, 130, 246, 0.35), 0 10px 40px rgba(0, 0, 0, 0.1);
+            --music-panel-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark {
+            --bg-start: #0b1120;
+            --bg-end: #111c33;
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --card: rgba(30, 41, 59, 0.7);
+            --card-blur: 24px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --avatar-glow: 0 0 40px rgba(59, 130, 246, 0.5), 0 10px 50px rgba(0, 0, 0, 0.4);
+            --music-panel-bg: rgba(30, 41, 59, 0.85);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 120px;
+            transition: background 0.6s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .container {
+            width: 100%;
+            text-align: center;
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 28px;
+            display: block;
+            box-shadow: var(--avatar-glow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            background: #e5e7eb;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.2));
+        }
+
+        .avatar.pulse {
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .avatar:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.5), 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(var(--card-blur));
+            -webkit-backdrop-filter: blur(var(--card-blur));
+            border-radius: 24px;
+            padding: 32px 24px 24px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .bio {
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            white-space: pre-line;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .links a {
+            display: block;
+            padding: 14px 20px;
+            background: var(--card);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .links a:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--card);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text);
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.08);
+        }
+
+        .tip {
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* 下滑提示 */
+        .scroll-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-light);
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: -10px;
+        }
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid var(--text-light);
+            border-bottom: 2px solid var(--text-light);
+            transform: rotate(45deg);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: rotate(45deg) translateY(0); }
+            40% { transform: rotate(45deg) translateY(6px); }
+            60% { transform: rotate(45deg) translateY(3px); }
+        }
+
+        /* 画廊 */
+        .gallery-section {
+            width: 100%;
+        }
+        .gallery-item {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(59,130,246,0.2);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 音乐播放器卡片 */
+        .music-player-card {
+            width: 100%;
+            background: var(--card);
+            backdrop-filter: blur(var(--card-blur));
+            -webkit-backdrop-filter: blur(var(--card-blur));
+            border-radius: 24px;
+            padding: 24px 20px 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .player-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .now-playing {
+            font-size: 12px;
+            color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .visualizer-wrapper {
+            width: 100%;
+            height: 48px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(var(--accent-rgb), 0.05);
+        }
+
+        .visualizer-wrapper canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 右下角浮动音乐面板 */
+        .music-panel {
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--music-panel-bg);
+            padding: 8px 12px;
+            border-radius: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            z-index: 20;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .music-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+
+        .music-btn:active {
+            transform: scale(0.9);
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .progress-bar {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 80px;
+            height: 4px;
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.4);
+        }
+
+        .time-label {
+            font-size: 10px;
+            color: var(--text-light);
+            min-width: 32px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" preload="metadata">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+
+    <!-- 右下角浮动音乐面板 -->
+    <div class="music-panel" id="musicPanel">
+        <button class="music-btn" id="musicBtn">▶</button>
+        <div class="progress-row">
+            <input type="range" class="progress-bar" id="progressBar" value="0" min="0" max="100" step="0.1">
+            <span class="time-label" id="timeLabel">00:00</span>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- 主卡片 -->
+        <div class="container">
+            <img src="avatar.jpg" class="avatar" id="avatar" alt="头像" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Ccircle cx=%2260%22 cy=%2260%22 r=%2260%22 fill=%22%23e5e7eb%22/%3E%3Ctext x=%2260%22 y=%2260%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%236b7280%22 font-size=%2236%22%3E👤%3C/text%3E%3C/svg%3E'">
+            <div class="card">
+                <h1>yy上衫</h1>
+                <p class="bio">学生 / 数码爱好者 / 前端小白<br>正在学习和折腾各种好玩的东西</p>
+                <div class="links">
+                    <a href="https://github.com/Y9527110" target="_blank" rel="noopener">社交账号</a>
+                    <a onclick="alert('QQ号：3355433546')">联系我</a>
+                </div>
+                <p class="tip">点击月亮切换主题，点击头像会有小惊喜 ✨</p>
+            </div>
+        </div>
+
+        <!-- 音乐播放器卡片（只有一首歌） -->
+        <div class="music-player-card">
+            <div class="player-header">
+                <span class="player-title">🎵 我的音乐</span>
+                <span class="now-playing" id="nowPlaying">默认歌曲</span>
+            </div>
+            <div class="visualizer-wrapper">
+                <canvas id="visualizerCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- 下滑提示 -->
+        <div class="scroll-hint">
+            <span>下滑查看更多</span>
+            <div class="scroll-arrow"></div>
+        </div>
+
+        <!-- 图片画廊（只有一张） -->
+        <div class="gallery-section">
+            <div class="gallery-item">
+                <img src="photo1.jpg" alt="照片">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const avatar = document.getElementById('avatar');
+            const bgMusic = document.getElementById('bgMusic');
+            const musicBtn = document.getElementById('musicBtn');
+            const progressBar = document.getElementById('progressBar');
+            const timeLabel = document.getElementById('timeLabel');
+            const nowPlaying = document.getElementById('nowPlaying');
+            const canvas = document.getElementById('visualizerCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let isDark = false;
+            let musicState = false;
+            let audioContext = null;
+            let analyser = null;
+            let source = null;
+            let animationId = null;
+
+            // Canvas 适配
+            function resizeCanvas() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width * window.devicePixelRatio;
+                canvas.height = rect.height * window.devicePixelRatio;
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // 主题切换
+            themeToggle.addEventListener('click', () => {
+                isDark = !isDark;
+                body.classList.toggle('dark', isDark);
+                themeToggle.textContent = isDark ? '☀️' : '🌙';
+            });
+
+            // 头像彩蛋
+            let clicks = 0;
+            let clickTimer = null;
+            avatar.addEventListener('click', () => {
+                clicks++;
+                if (clicks === 1) clickTimer = setTimeout(() => clicks = 0, 1500);
+                if (clicks === 3) {
+                    clearTimeout(clickTimer);
+                    clicks = 0;
+                    const wasPulse = avatar.classList.contains('pulse');
+                    avatar.classList.remove('pulse');
+                    avatar.style.animation = 'none';
+                    avatar.style.transform = 'scale(1.1) rotate(5deg)';
+                    setTimeout(() => {
+                        avatar.style.transform = '';
+                        avatar.style.animation = '';
+                        if (wasPulse) avatar.classList.add('pulse');
+                    }, 300);
+                }
+            });
+
+            // Web Audio
+            function initAudioContext() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256;
+                    analyser.smoothingTimeConstant = 0.5;
+                    source = audioContext.createMediaElementSource(bgMusic);
+                    source.connect(analyser);
+                    analyser.connect(audioContext.destination);
+                }
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            }
+
+            // 波动可视化
+            const frequencyData = new Uint8Array(128);
+            function drawVisualizer() {
+                animationId = requestAnimationFrame(drawVisualizer);
+                if (!analyser) return;
+                analyser.getByteFrequencyData(frequencyData);
+
+                const width = canvas.width / window.devicePixelRatio;
+                const height = canvas.height / window.devicePixelRatio;
+                ctx.clearRect(0, 0, width, height);
+
+                const progress = bgMusic.duration ? bgMusic.currentTime / bgMusic.duration : 0;
+                const barY = height / 2 - 3;
+
+                // 背景轨
+                ctx.fillStyle = 'rgba(128, 128, 128, 0.15)';
+                ctx.beginPath();
+                ctx.roundRect(4, barY - 2, width - 8, 8, 8);
+                ctx.fill();
+
+                // 已播放
+                const playedWidth = (width - 8) * progress;
+                if (playedWidth > 4) {
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.7)';
+                    ctx.beginPath();
+                    ctx.roundRect(4, barY - 2, playedWidth, 8, 8);
+                    ctx.fill();
+                }
+
+                // 频谱柱
+                const barCount = 48;
+                const barWidth = (width - 16) / barCount;
+                const maxBarHeight = height * 0.8;
+                for (let i = 0; i < barCount; i++) {
+                    const dataIndex = Math.floor(i * frequencyData.length / barCount);
+                    const value = frequencyData[dataIndex] / 255;
+                    const bh = 4 + value * maxBarHeight;
+                    const x = 8 + i * barWidth;
+                    const y = height / 2 - bh / 2;
+                    const barProgress = i / barCount;
+                    ctx.fillStyle = barProgress <= progress
+                        ? `rgba(59, 130, 246, ${0.5 + value * 0.5})`
+                        : `rgba(128, 128, 128, ${0.2 + value * 0.15})`;
+                    ctx.beginPath();
+                    ctx.roundRect(x + 1, y, barWidth - 2, bh, 3);
+                    ctx.fill();
+                }
+            }
+
+            function formatTime(sec) {
+                if (isNaN(sec)) return '00:00';
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+
+            function updateProgressUI() {
+                if (bgMusic.duration) {
+                    progressBar.value = (bgMusic.currentTime / bgMusic.duration) * 100;
+                    timeLabel.textContent = formatTime(bgMusic.currentTime);
+                }
+            }
+
+            function playMusic() {
+                initAudioContext();
+                bgMusic.play().then(() => {
+                    musicState = true;
+                    musicBtn.textContent = '❚❚';
+                    avatar.classList.add('pulse');
+                    if (!animationId) drawVisualizer();
+                }).catch(() => {});
+            }
+
+            function pauseMusic() {
+                bgMusic.pause();
+                musicState = false;
+                musicBtn.textContent = '▶';
+                avatar.classList.remove('pulse');
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+
+            musicBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (musicState) {
+                    pauseMusic();
+                } else {
+                    playMusic();
+                }
+            });
+
+            progressBar.addEventListener('input', (e) => {
+                if (bgMusic.duration) {
+                    const seekTime = (e.target.value / 100) * bgMusic.duration;
+                    bgMusic.currentTime = seekTime;
+                    timeLabel.textContent = formatTime(seekTime);
+                }
+            });
+
+            bgMusic.addEventListener('loadedmetadata', () => {
+                progressBar.max = 100;
+                timeLabel.textContent = '00:00';
+            });
+            bgMusic.addEventListener('timeupdate', updateProgressUI);
+            bgMusic.addEventListener('play', () => {
+                musicState = true;
+                musicBtn.textContent = '❚❚';
+                avatar.classList.add('pulse');
+                if (!animationId) drawVisualizer();
+            });
+            bgMusic.addEventListener('pause', () => {
+                musicState = false;
+                musicBtn.textContent = '▶';
+                avatar.classList.remove('pulse');
+            });
+
+            document.getElementById('musicPanel').addEventListener('click', (e) => e.stopPropagation());
+
+            // 初始绘制
+            setTimeout(() => {
+                const w = canvas.width / window.devicePixelRatio;
+                const h = canvas.height / window.devicePixelRatio;
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = 'rgba(128, 128, 128, 0.15)';
+                ctx.beginPath();
+                ctx.roundRect(4, h/2 - 4, w - 8, 8, 8);
+                ctx.fill();
+            }, 100);
+        })();
+    </script>
+</body>
+</html>
